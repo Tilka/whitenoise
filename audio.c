@@ -79,7 +79,7 @@ audio_dev_handle audio_init(int* rate, int* latency, int try_arts)
     handle.use_arts       = 0;
 #endif
     handle.dev_dsp_handle = -1;
-    handle.channels       = 0;  /* mono */
+    handle.channels       = 1;  /* mono */
     handle.format         = AFMT_U8;
     handle.rate           = *rate;
 

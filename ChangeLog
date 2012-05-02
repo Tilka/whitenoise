@@ -1,0 +1,53 @@
+whitenoise ChangeLog
+---------------------------------------------------------------
+
+v 1.0.2
+
+09/25/10  --  Fix a number of possible buffer overflows,
+              check errors more rigorously, etc.
+
+
+v 1.0.1
+
+02/13/04  --  Fix for linking failure on some platforms.
+
+
+v 1.0
+
+02/11/04  --  Updated documentation.
+
+01/15/04  --  Added an option to change the latency.  The
+              default latency is decreased to 200ms, which
+              feels pretty responsive when changing audio
+              characteristics dynamically.
+
+01/14/04  --  Added the ability to generate plots of the
+              filter frequency response, using gnuplot(1).
+
+              Added native aRts support.
+
+01/08/04  --  Implemented the ability to read commands from
+              stdin, in realtime.
+
+
+v 0.3
+
+01/07/04  --  Added the -r RATE option.
+
+01/07/04  --  Shortened the /dev/dsp sample blocksize.  The
+              previous setting did not work properly at least
+              with the i810_audio driver.
+
+              Thanks to jj Behrens <jjinux@yahoo.com> for the 
+              bug report and patch.
+
+
+v 0.2
+
+04/09/02  --  Added the fade option.
+
+              Added a choice of five standard windowed-FIR 
+              lowpass filters.  (Blackman, Bartlett, Hanning, 
+              Hamming, Rectangular)
+
+

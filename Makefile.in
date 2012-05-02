@@ -1,0 +1,42 @@
+# whitenoise Makefile
+
+# autoconf substitutions
+LIBARTS_LIBS     = @LIBARTS_LIBS@
+LIBARTS_CPPFLAGS = @LIBARTS_CPPFLAGS@
+LIBARTS_LDFLAGS  = @LIBARTS_LDFLAGS@
+LIBFFTW_LIBS     = @LIBFFTW_LIBS@
+LIBFFTW_CPPFLAGS = @LIBFFTW_CPPFLAGS@
+LIBFFTW_LDFLAGS  = @LIBFFTW_LDFLAGS@
+CFLAGS           = @CFLAGS@ -Wall
+LIBS             = @LIBS@
+DEFS             = @DEFS@
+prefix           = @prefix@
+
+
+# main targets
+all: whitenoise
+
+OBJECTS = audio.o filter.o plot.o whitenoise.o
+
+whitenoise: $(OBJECTS)
+	$(CC) -o whitenoise $(LIBARTS_LDFLAGS) $(LIBFFTW_LDFLAGS) $(OBJECTS) $(LIBARTS_LIBS) $(LIBFFTW_LIBS) $(LIBS)
+
+# suffixes
+.c.o: 
+	$(CC) -c $(CFLAGS) $(DEFS) $(LIBARTS_CPPFLAGS) $(LIBFFTW_CPPFLAGS) $<
+
+clean:
+	rm -f whitenoise *.o core *~
+
+distclean: clean
+	rm -f Makefile configure config.h config.log config.status; 
+	rm -rf autom4te.cache
+
+install: all
+	install -m 755 whitenoise $(prefix)/bin/whitenoise
+
+uninstall:
+	rm -f $(prefix)/bin/whitenoise
+
+
+# arch-tag: DO_NOT_CHANGE_9717e603-5609-4c80-9aab-654ec79ac25e 

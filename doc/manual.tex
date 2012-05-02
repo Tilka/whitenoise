@@ -1,0 +1,242 @@
+\documentclass[12pt,oneside,notitlepage]{article}
+\usepackage{times}
+\usepackage[dvips]{graphics}
+\usepackage{fullpage}
+\usepackage{longtable}
+
+% Set up the page headers and footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{whitenoise 1.0}
+\rhead{User Documentation}
+\rfoot{Paul J. Pelzl}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.2pt}
+\renewcommand{\headheight}{0.5in}
+
+\renewcommand{\arraystretch}{2.0}
+
+
+\title{whitenoise v1.0 \\ User Documentation}
+\author{Copyright \copyright 2001, 2002, 2004, 2010 Paul Pelzl}
+\date{September 25, 2010}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+{\tt whitenoise} is a little utility that allows your computer to act as an ambient
+random noise generator.  You may find this useful for drowning out noisy
+neighbors, helping you sleep, etc.
+
+
+\section{Usage}
+
+\subsection{Command-line syntax}
+Syntax:  {\tt whitenoise [option(s)]}
+
+\noindent
+options:
+
+%BEGIN LATEX
+\begin{longtable}{lp{4in}}
+%END LATEX
+%HEVEA \begin{tabular}{lp{4in}}
+   {\tt -c CUTOFF} &    Sets the lowpass frequency cutoff.
+                        {\tt CUTOFF} is a number in the range {\tt (0, 1)},
+                        with a default value of {\tt 0.3}. \\
+   {\tt -r RATE} &      Sets the samplerate for the sound card, in Hz.
+                        Acceptable values are {\tt 11025} and {\tt 22050}, with
+                        a default value of {\tt 22050}. \\
+   {\tt -F FILTNUM} &   Use a filter of type {\tt FILTNUM}, which may
+                        take the following values:
+                        \newcounter{filt}
+                        \begin{list}{ {\tt \arabic{filt}} :}
+                           {\usecounter{filt}
+                           \setcounter{filt}{-1}}
+                           \item Blackman-windowed FIR lowpass (default)
+                           \item Bartlett-windowed FIR lowpass
+                           \item Hanning-windowed FIR lowpass
+                           \item Hamming-windowed FIR lowpass
+                           \item Rectangular-windowed FIR lowpass
+                        \end{list} \\
+  {\tt -l LENGTH} &     Sets the FIR filter length.
+                        {\tt LENGTH} is an integer in the range {\tt [1, 100]},
+                        with a default value of {\tt 25}. \\
+  {\tt -t TIME} &       Sets the length of time to generate
+                        noise, in minutes. \\
+  {\tt -f FADETIME} &   Fade the noise out over {\tt FADETIME}
+                        seconds.  Valid only when used along with
+                        the {\tt -t} flag. \\
+  {\tt -p WIDTH} &      Output a plot of the filter frequency response,
+                       {\tt WIDTH} is the horizontal resolution of the
+                        PNG image, with default 320.  The image will
+                        have filename {\tt \~{}/.whitenoise/filter.png} . \\
+  {\tt -L LATENCY} &    Configure the audio buffers for approximately
+                        {\tt LATENCY} milliseconds of delay, with default
+                        200.  Increase the value to alleviate
+                        problems with skipping. \\
+  {\tt -a} &            Interface with aRts instead of opening
+                        /dev/dsp directly. \\
+  {\tt -s} &            Read commands from stdin in realtime. \\
+  {\tt -v, --version} & Print version information. \\
+  {\tt --help, -?} &    This help page. \\
+%HEVEA \end{tabular}
+%BEGIN LATEX
+\end{longtable}
+%END LATEX
+
+Increasing or decreasing the frequency cutoff value will increase or decrease
+the amount of high frequency content in the noise.  The samplerate can be
+lowered to 11025 Hz for "warmer" noise that is dominated by lower frequencies.
+Choosing a different filter will impact the overall balance of frequencies in
+the noise.  Increasing the filter length will make the lowpass filter more
+ideal, at the cost of increased CPU usage.
+
+If whitenoise tends to skip (for example, under high CPU load), then it may
+help to increase the latency via the ``{\tt -L}" option.
+
+The ``{\tt -p}" option is available only if whitenoise is compiled with support
+for FFTW 3.x.  Similarly, the ``{\tt -a}" option is only available when whitenoise
+has been compiled against aRts.
+
+When the ``{\tt -s}" option is used, whitenoise will continually read commands
+from stdin.  This may be useful for creating a frontend to control
+whitenoise ({\tt gnome-whitenoise} is one example).  See Section \ref{stdin} for
+further information.
+
+\subsection{Controlling whitenoise via standard input}
+\label{stdin}
+If {\tt whitenoise} is launched in interactive mode via the ``{\tt -s}'' option,
+then it will continually scan standard input for command strings.
+Acceptable command strings take the form
+\begin{verbatim}
+xaaaaaa...
+\end{verbatim}
+and should be terminated with newline.  `{\tt x}' represents a command character; the
+possible characters are the same as the command-line switches: \{ {\tt c, r, F, l, t, f, p}\}.
+``{\tt aaaaa....}" is a string providing the argument of the command.  The character `{\tt q}'
+can also be used to terminate whitenoise.  Some special cases deserve attention:
+
+\begin{itemize}
+   \item Using the ``{\tt tTIME}" command will reset the timer; i.e. the command ``{\tt t30}''
+     will shut off whitenoise 30 minutes after the command is entered.
+  \item To cancel the timer or the fade option, use ``{\tt -1}'' as the argument to those
+     commands.
+\end{itemize}
+
+You should expect a short delay between entering a command and hearing the
+result.
+
+
+\section{Requirements}
+{\tt whitenoise} requires a sound card with Open Sound System-compatible
+drivers.  I use GNU/Linux for development, but I expect that it should work
+without difficulty on *BSD machines, and users have previously reported that
+{\tt whitenoise} also works fine on Windows via 
+%BEGIN LATEX
+Cygwin\footnote{ {\tt http://www.cygwin.com/}}.
+%END LATEX
+%HEVEA \begin{rawhtml} <a href="http://www.cygwin.com">Cygwin</a>. \end{rawhtml}
+On very low-end systems, it may
+be necessary to decrease the filter length to prevent skipping.
+
+The 
+%BEGIN LATEX
+aRts\footnote{ {\tt http://www.arts-project.org/} }
+%END LATEX
+%HEVEA \begin{rawhtml} <a href="http://www.arts-project.org/">aRts</a> \end{rawhtml}
+library and header files 
+are required only if you want whitenoise to support output to artsd, the sound
+server that ships with KDE.  (Specifically, {\tt artsc.h} and libartsc are
+required.)
+
+%BEGIN LATEX
+FFTW v3.x\footnote{ {\tt http://www.fftw.org/} }
+%END LATEX
+%HEVEA \begin{rawhtml} <a href="http://www.fftw.org/">FFTW v3.x</a> \end{rawhtml}
+is required if you want whitenoise
+to be able to generate plots of the filter frequency response. 
+%BEGIN LATEX
+gnuplot\footnote{ {\tt http://www.gnuplot.info/} }
+%END LATEX
+%HEVEA \begin{rawhtml} <a href="http://www.gnuplot.info/">gnuplot</a> \end{rawhtml}
+is also a requirement for plotting, although it is not needed during compilation.
+
+
+
+\section{Installation}
+In general, enter the root of the {\tt whitenoise} source directory and use
+\begin{verbatim}
+$ ./configure
+$ make
+\end{verbatim}
+to compile the executable (which is, of course, called {\tt whitenoise}).  Run
+\begin{verbatim}
+$ make install
+\end{verbatim}
+to install it (you may need to be root to have permission to copy the executable
+to a system directory).
+
+You can use
+\begin{verbatim}
+$ ./configure --help
+\end{verbatim}
+to see some of the options that {\tt configure} accepts.  In particular, you may be interested in
+the options that identify the locations of the aRts and FFTW headers and libraries.  For example, on my
+system I use 
+\begin{verbatim}
+$ ./configure --with-arts-inc=/usr/include/kde/artsc
+\end{verbatim}
+to properly detect {\tt artsc.h}.
+
+
+\section{License}
+{\tt whitenoise} is Free Software, released under the GNU General Public License.
+You are free to modify and redistribute {\tt whitenoise} under certain conditions; 
+see {\tt COPYING} for details.
+
+
+
+\section{How it works}
+Uniform random noise is generated with rand().  This noise sounds awful because
+it has too much high-frequency content, so it is lowpass filtered.  There are
+a number of standard filters available for this purpose, all of which are 
+designed using the window method.  Yes, I am aware that the noise generated 
+by this scheme is not technically ``white", but real white noise has rather 
+disturbing audio characteristics.
+
+
+
+\section{Future work}
+It is unlikely that there will be any significant changes in the future.
+
+
+
+\section{Contact info}
+Feel free to contact me if you:
+\begin{itemize}
+   \item like whitenoise
+   \item hate whitenoise
+   \item find bugs
+\end{itemize}
+
+%BEGIN LATEX
+\renewcommand{\arraystretch}{1.0}
+\begin{tabular}{ll}
+   {\tt whitenoise} homepage: & {\tt http://pessimization.com/software/whitenoise} \\
+   my email: &                  {\tt <pelzlpj@gmail.com>}
+\end{tabular}
+%END LATEX
+%HEVEA \begin{rawhtml} <a href="http://pessimization.com/software/whitenoise">whitenoise homepage</a><br> \end{rawhtml}
+%HEVEA \begin{rawhtml} <a href="mailto:pelzlpj@gmail.com">send me email</a> \end{rawhtml}
+
+
+\end{document}
+
+
+
+% arch-tag: DO_NOT_CHANGE_8527ca15-717f-4d4d-81df-978ea00f6736 

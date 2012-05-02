@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<TITLE>whitenoise v1.0 
+User Documentation
+</TITLE>
+
+<META http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<META name="GENERATOR" content="hevea 1.10">
+<STYLE type="text/css">
+.li-itemize{margin:1ex 0ex;}
+.li-enumerate{margin:1ex 0ex;}
+.dd-description{margin:0ex 0ex 1ex 4ex;}
+.dt-description{margin:0ex;}
+.toc{list-style:none;}
+.thefootnotes{text-align:left;margin:0ex;}
+.dt-thefootnotes{margin:0em;}
+.dd-thefootnotes{margin:0em 0em 0em 2em;}
+.footnoterule{margin:1em auto 1em 0px;width:50%;}
+.caption{padding-left:2ex; padding-right:2ex; margin-left:auto; margin-right:auto}
+.title{margin:2ex auto;text-align:center}
+.center{text-align:center;margin-left:auto;margin-right:auto;}
+.flushleft{text-align:left;margin-left:0ex;margin-right:auto;}
+.flushright{text-align:right;margin-left:auto;margin-right:0ex;}
+DIV TABLE{margin-left:inherit;margin-right:inherit;}
+PRE{text-align:left;margin-left:0ex;margin-right:auto;}
+BLOCKQUOTE{margin-left:4ex;margin-right:4ex;text-align:left;}
+TD P{margin:0px;}
+.boxed{border:1px solid black}
+.textboxed{border:1px solid black}
+.vbar{border:none;width:2px;background-color:black;}
+.hbar{border:none;height:2px;width:100%;background-color:black;}
+.hfill{border:none;height:1px;width:200%;background-color:black;}
+.vdisplay{border-collapse:separate;border-spacing:2px;width:auto; empty-cells:show; border:2px solid red;}
+.vdcell{white-space:nowrap;padding:0px;width:auto; border:2px solid green;}
+.display{border-collapse:separate;border-spacing:2px;width:auto; border:none;}
+.dcell{white-space:nowrap;padding:0px;width:auto; border:none;}
+.dcenter{margin:0ex auto;}
+.vdcenter{border:solid #FF8000 2px; margin:0ex auto;}
+.minipage{text-align:left; margin-left:0em; margin-right:auto;}
+.marginpar{border:solid thin black; width:20%; text-align:left;}
+.marginparleft{float:left; margin-left:0ex; margin-right:1ex;}
+.marginparright{float:right; margin-left:1ex; margin-right:0ex;}
+.theorem{text-align:left;margin:1ex auto 1ex 0ex;}
+.part{margin:2ex auto;text-align:center}
+</STYLE>
+</HEAD>
+<BODY >
+<!--HEVEA command line is: /usr/bin/hevea manual.tex -->
+<!--CUT DEF section 1 --><TABLE CLASS="title"><TR><TD><H1 CLASS="titlemain">whitenoise v1.0<BR>
+User Documentation</H1><H3 CLASS="titlerest">Copyright &#XA9;2001, 2002, 2004, 2010 Paul Pelzl</H3><H3 CLASS="titlerest">September 25, 2010</H3></TD></TR>
+</TABLE><!--TOC section Introduction-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc1">1</A>&#XA0;&#XA0;Introduction</H2><!--SEC END --><P>
+<TT>whitenoise</TT> is a little utility that allows your computer to act as an ambient
+random noise generator. You may find this useful for drowning out noisy
+neighbors, helping you sleep, etc.</P><!--TOC section Usage-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc2">2</A>&#XA0;&#XA0;Usage</H2><!--SEC END --><!--TOC subsection Command-line syntax-->
+<H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc3">2.1</A>&#XA0;&#XA0;Command-line syntax</H3><!--SEC END --><P>
+Syntax: <TT>whitenoise [option(s)]</TT></P><P>options:</P><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-c CUTOFF</TT></TD><TD VALIGN=top ALIGN=left>Sets the lowpass frequency cutoff.
+<TT>CUTOFF</TT> is a number in the range <TT>(0, 1)</TT>,
+with a default value of <TT>0.3</TT>.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-r RATE</TT></TD><TD VALIGN=top ALIGN=left>Sets the samplerate for the sound card, in Hz.
+Acceptable values are <TT>11025</TT> and <TT>22050</TT>, with
+a default value of <TT>22050</TT>.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-F FILTNUM</TT></TD><TD VALIGN=top ALIGN=left>Use a filter of type <TT>FILTNUM</TT>, which may
+take the following values:
+
+<DL CLASS="list"><DT CLASS="dt-list">
+
+
+ <TT>0</TT> :</DT><DD CLASS="dd-list">Blackman-windowed FIR lowpass (default)
+</DD><DT CLASS="dt-list"> <TT>1</TT> :</DT><DD CLASS="dd-list">Bartlett-windowed FIR lowpass
+</DD><DT CLASS="dt-list"> <TT>2</TT> :</DT><DD CLASS="dd-list">Hanning-windowed FIR lowpass
+</DD><DT CLASS="dt-list"> <TT>3</TT> :</DT><DD CLASS="dd-list">Hamming-windowed FIR lowpass
+</DD><DT CLASS="dt-list"> <TT>4</TT> :</DT><DD CLASS="dd-list">Rectangular-windowed FIR lowpass
+</DD></DL></TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-l LENGTH</TT></TD><TD VALIGN=top ALIGN=left>Sets the FIR filter length.
+<TT>LENGTH</TT> is an integer in the range <TT>[1, 100]</TT>,
+with a default value of <TT>25</TT>.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-t TIME</TT></TD><TD VALIGN=top ALIGN=left>Sets the length of time to generate
+noise, in minutes.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-f FADETIME</TT></TD><TD VALIGN=top ALIGN=left>Fade the noise out over <TT>FADETIME</TT>
+seconds. Valid only when used along with
+the <TT>-t</TT> flag.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-p WIDTH</TT></TD><TD VALIGN=top ALIGN=left>Output a plot of the filter frequency response,
+<TT>WIDTH</TT> is the horizontal resolution of the
+PNG image, with default 320. The image will
+have filename <TT>~/.whitenoise/filter.png</TT> .</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-L LATENCY</TT></TD><TD VALIGN=top ALIGN=left>Configure the audio buffers for approximately
+<TT>LATENCY</TT> milliseconds of delay, with default
+200. Increase the value to alleviate
+problems with skipping.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-a</TT></TD><TD VALIGN=top ALIGN=left>Interface with aRts instead of opening
+/dev/dsp directly.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-s</TT></TD><TD VALIGN=top ALIGN=left>Read commands from stdin in realtime.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>-v, --version</TT></TD><TD VALIGN=top ALIGN=left>Print version information.</TD></TR>
+<TR><TD VALIGN=top ALIGN=left NOWRAP> <TT>--help, -?</TT></TD><TD VALIGN=top ALIGN=left>This help page.</TD></TR>
+</TABLE><P>Increasing or decreasing the frequency cutoff value will increase or decrease
+the amount of high frequency content in the noise. The samplerate can be
+lowered to 11025 Hz for "warmer" noise that is dominated by lower frequencies.
+Choosing a different filter will impact the overall balance of frequencies in
+the noise. Increasing the filter length will make the lowpass filter more
+ideal, at the cost of increased CPU usage.</P><P>If whitenoise tends to skip (for example, under high CPU load), then it may
+help to increase the latency via the &#X201C;<TT>-L</TT>" option.</P><P>The &#X201C;<TT>-p</TT>" option is available only if whitenoise is compiled with support
+for FFTW 3.x. Similarly, the &#X201C;<TT>-a</TT>" option is only available when whitenoise
+has been compiled against aRts.</P><P>When the &#X201C;<TT>-s</TT>" option is used, whitenoise will continually read commands
+from stdin. This may be useful for creating a frontend to control
+whitenoise (<TT>gnome-whitenoise</TT> is one example). See Section <A HREF="#stdin">2.2</A> for
+further information.</P><!--TOC subsection Controlling whitenoise via standard input-->
+<H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc4">2.2</A>&#XA0;&#XA0;Controlling whitenoise via standard input</H3><!--SEC END --><P>
+<A NAME="stdin"></A>
+If <TT>whitenoise</TT> is launched in interactive mode via the &#X201C;<TT>-s</TT>&#X201D; option,
+then it will continually scan standard input for command strings.
+Acceptable command strings take the form
+</P><PRE CLASS="verbatim">xaaaaaa...
+</PRE><P>and should be terminated with newline. &#X2018;<TT>x</TT>&#X2019; represents a command character; the
+possible characters are the same as the command-line switches: { <TT>c, r, F, l, t, f, p</TT>}.
+&#X201C;<TT>aaaaa....</TT>" is a string providing the argument of the command. The character &#X2018;<TT>q</TT>&#X2019;
+can also be used to terminate whitenoise. Some special cases deserve attention:</P><UL CLASS="itemize"><LI CLASS="li-itemize">
+Using the &#X201C;<TT>tTIME</TT>" command will reset the timer; i.e. the command &#X201C;<TT>t30</TT>&#X201D;
+will shut off whitenoise 30 minutes after the command is entered.
+</LI><LI CLASS="li-itemize">To cancel the timer or the fade option, use &#X201C;<TT>-1</TT>&#X201D; as the argument to those
+commands.
+</LI></UL><P>You should expect a short delay between entering a command and hearing the
+result.</P><!--TOC section Requirements-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc5">3</A>&#XA0;&#XA0;Requirements</H2><!--SEC END --><P>
+<TT>whitenoise</TT> requires a sound card with Open Sound System-compatible
+drivers. I use GNU/Linux for development, but I expect that it should work
+without difficulty on *BSD machines, and users have previously reported that
+<TT>whitenoise</TT> also works fine on Windows via 
+ <a href="http://www.cygwin.com">Cygwin</a>. On very low-end systems, it may
+be necessary to decrease the filter length to prevent skipping.</P><P>The 
+ <a href="http://www.arts-project.org/">aRts</a> library and header files 
+are required only if you want whitenoise to support output to artsd, the sound
+server that ships with KDE. (Specifically, <TT>artsc.h</TT> and libartsc are
+required.)</P><P> <a href="http://www.fftw.org/">FFTW v3.x</a> is required if you want whitenoise
+to be able to generate plots of the filter frequency response. 
+ <a href="http://www.gnuplot.info/">gnuplot</a> is also a requirement for plotting, although it is not needed during compilation.</P><!--TOC section Installation-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc6">4</A>&#XA0;&#XA0;Installation</H2><!--SEC END --><P>
+In general, enter the root of the <TT>whitenoise</TT> source directory and use
+</P><PRE CLASS="verbatim">$ ./configure
+$ make
+</PRE><P>to compile the executable (which is, of course, called <TT>whitenoise</TT>). Run
+</P><PRE CLASS="verbatim">$ make install
+</PRE><P>to install it (you may need to be root to have permission to copy the executable
+to a system directory).</P><P>You can use
+</P><PRE CLASS="verbatim">$ ./configure --help
+</PRE><P>to see some of the options that <TT>configure</TT> accepts. In particular, you may be interested in
+the options that identify the locations of the aRts and FFTW headers and libraries. For example, on my
+system I use 
+</P><PRE CLASS="verbatim">$ ./configure --with-arts-inc=/usr/include/kde/artsc
+</PRE><P>to properly detect <TT>artsc.h</TT>.</P><!--TOC section License-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc7">5</A>&#XA0;&#XA0;License</H2><!--SEC END --><P>
+<TT>whitenoise</TT> is Free Software, released under the GNU General Public License.
+You are free to modify and redistribute <TT>whitenoise</TT> under certain conditions; 
+see <TT>COPYING</TT> for details.</P><!--TOC section How it works-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc8">6</A>&#XA0;&#XA0;How it works</H2><!--SEC END --><P>
+Uniform random noise is generated with rand(). This noise sounds awful because
+it has too much high-frequency content, so it is lowpass filtered. There are
+a number of standard filters available for this purpose, all of which are 
+designed using the window method. Yes, I am aware that the noise generated 
+by this scheme is not technically &#X201C;white", but real white noise has rather 
+disturbing audio characteristics.</P><!--TOC section Future work-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc9">7</A>&#XA0;&#XA0;Future work</H2><!--SEC END --><P>
+It is unlikely that there will be any significant changes in the future.</P><!--TOC section Contact info-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc10">8</A>&#XA0;&#XA0;Contact info</H2><!--SEC END --><P>
+Feel free to contact me if you:
+</P><UL CLASS="itemize"><LI CLASS="li-itemize">
+like whitenoise
+</LI><LI CLASS="li-itemize">hate whitenoise
+</LI><LI CLASS="li-itemize">find bugs
+</LI></UL><P> <a href="http://pessimization.com/software/whitenoise">whitenoise homepage</a><br>  <a href="mailto:pelzlpj@gmail.com">send me email</a> </P><!--CUT END -->
+<!--HTMLFOOT-->
+<!--ENDHTML-->
+<!--FOOTER-->
+<HR SIZE=2><BLOCKQUOTE CLASS="quote"><EM>This document was translated from L<sup>A</sup>T<sub>E</sub>X by
+</EM><A HREF="http://hevea.inria.fr/index.html"><EM>H</EM><EM><FONT SIZE=2><sup>E</sup></FONT></EM><EM>V</EM><EM><FONT SIZE=2><sup>E</sup></FONT></EM><EM>A</EM></A><EM>.</EM></BLOCKQUOTE></BODY>
+</HTML>

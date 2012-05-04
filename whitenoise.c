@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 #endif
 
     int use_arts = 0;
-    audio_dev_handle dsp_handle;
+    audio_dev_handle audio_handle;
 
     int latency = DEFAULT_LATENCY;
     int read_stdin = 0;
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
     }
        
     // (Either succeeds or aborts the program)
-    dsp_handle = audio_init(&rate, &latency, use_arts);
+    audio_init(&audio_handle, rate, latency, use_arts);
     
     /* Create the lowpass filter for a given length */
     if ((coeff = (double *) calloc(filterLength, sizeof(double))) == NULL)
@@ -417,7 +417,7 @@ int main(int argc, char* argv[])
                         {
                             rate = DEFAULT_RATE;
                         }
-                        audio_set_rate(&dsp_handle, rate);
+                        audio_set_rate(&audio_handle, rate);
                     }
                     /* change filter type */
                     else if (command[0] == 'F') 
@@ -483,7 +483,7 @@ int main(int argc, char* argv[])
                         {
                             latency = DEFAULT_LATENCY;
                         }
-                        audio_set_latency(&dsp_handle, latency);
+                        audio_set_latency(&audio_handle, latency);
                     }
                     /* quit */
                     else if (command[0] == 'q')
@@ -505,7 +505,7 @@ int main(int argc, char* argv[])
 
         filter(data, filteredData, SAMPLE_SIZE, coeff, filterLength); 
         /* Output the filtered noise to the sound card. */
-        audio_write(dsp_handle, filteredData, SAMPLE_SIZE);
+        audio_write(&audio_handle, filteredData, SAMPLE_SIZE);
     }
 
 
@@ -540,7 +540,7 @@ int main(int argc, char* argv[])
 
             filter(data, filteredData, SAMPLE_SIZE, coeff, filterLength); 
             /* Output the filtered noise to the sound card. */
-            audio_write(dsp_handle, filteredData, SAMPLE_SIZE);
+            audio_write(&audio_handle, filteredData, SAMPLE_SIZE);
         }
     }
             
@@ -558,7 +558,7 @@ cleanup:
     fftw_cleanup();
 #endif
 
-    audio_exit(dsp_handle);
+    audio_exit(&audio_handle);
     return(0);
 }
 

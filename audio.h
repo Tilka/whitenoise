@@ -25,11 +25,12 @@
 #include <artsc.h>
 #endif
 
+#include <alsa/asoundlib.h>
 
 typedef struct 
 {
-    int dev_dsp_handle;
-    int fragment;
+    snd_pcm_t* alsa_handle;
+    int latency;
     int channels;
     int format;
     int rate;
@@ -40,9 +41,9 @@ typedef struct
 } audio_dev_handle;
 
 
-audio_dev_handle audio_init(int* rate, int* latency, int try_arts);
-void audio_exit(audio_dev_handle handle);
-void audio_write(audio_dev_handle handle, unsigned char* buffer, int size);
+void audio_init(audio_dev_handle* handle, int rate, int latency, int try_arts);
+void audio_exit(audio_dev_handle* handle);
+void audio_write(audio_dev_handle* handle, unsigned char* buffer, int size);
 void audio_set_rate(audio_dev_handle* handle, int rate);
 void audio_set_latency(audio_dev_handle* handle, int latency);
 

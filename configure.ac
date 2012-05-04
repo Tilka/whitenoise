@@ -98,6 +98,7 @@ if test "x$fftw_ok" = "xyes"; then
 fi
 
 AC_CHECK_LIB(m, sin)
+AC_CHECK_LIB(asound, snd_pcm_open)
 
 dnl substitutions
 AC_SUBST(LIBARTS_LIBS)

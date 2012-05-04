@@ -35,57 +35,45 @@
 #include "audio.h"
 
 
-/* directly open the /dev/dsp device */
-void open_dev_dsp(audio_dev_handle* handle)
+/* initialize ALSA */
+static void alsa_init(audio_dev_handle* handle)
 {
+    int err;
+
     /* Set up the sound card */
-    if ( (handle->dev_dsp_handle = open("/dev/dsp", O_WRONLY)) == -1 ) 
+    if ( (err = snd_pcm_open(&handle->alsa_handle, "default", SND_PCM_STREAM_PLAYBACK, 0)) < 0 )
     {
-        perror("Opening /dev/dsp");
-        exit(-1);
+        printf("snd_pcm_open failed: %s\n", snd_strerror(err));
+        exit(EXIT_FAILURE);
     }
-    if ( ioctl(handle->dev_dsp_handle, SNDCTL_DSP_SETFRAGMENT, &(handle->fragment)) == -1 ) 
-    {
-        perror("fragment fragment size");
-        exit(errno);
-    }
-    if ( ioctl(handle->dev_dsp_handle, SNDCTL_DSP_CHANNELS, &(handle->channels)) == -1 ) 
-    {
-        perror("fragment stereo");
-        exit(errno);
-    }
-    if ( ioctl(handle->dev_dsp_handle, SNDCTL_DSP_SETFMT, &(handle->format)) == -1 ) 
-    {
-        perror("fragment format");
-        exit(errno);
-    }
-    if ( ioctl(handle->dev_dsp_handle, SNDCTL_DSP_SPEED, &(handle->rate)) == -1 ) 
-    {
-        perror("fragment sample rate");
-        exit(errno);
+
+    if ( (err = snd_pcm_set_params(handle->alsa_handle,
+                                   handle->format,
+                                   SND_PCM_ACCESS_RW_INTERLEAVED,
+                                   handle->channels,
+                                   handle->rate,
+                                   1, /* allow resampling */
+                                   handle->latency * 1000)) < 0) {
+        printf("snd_pcm_set_params failed: %s\n", snd_strerror(err));
+	exit(EXIT_FAILURE);
     }
 }
 
 
 /* initialize the sound card or connect to aRts server */
-audio_dev_handle audio_init(int* rate, int* latency, int try_arts)
+void audio_init(audio_dev_handle* handle, int rate, int latency, int try_arts)
 {
-    audio_dev_handle handle;
-    double samples;
 #ifdef HAS_ARTS
     int artserr = 0;
 
-    handle.arts_handle    = NULL;
-    handle.use_arts       = 0;
+    handle->arts_handle = NULL;
+    handle->use_arts    = 0;
 #endif
-    handle.dev_dsp_handle = -1;
-    handle.channels       = 1;  /* mono */
-    handle.format         = AFMT_U8;
-    handle.rate           = *rate;
-
-    samples = ((double) *latency) / 1000.0 * ((double) handle.rate);
-    samples /= 2.0;
-    handle.fragment = ((int) (log(samples) / log(2.0))) + 2*65536;
+    handle->alsa_handle = NULL;
+    handle->channels    = 1;  /* mono */
+    handle->format      = SND_PCM_FORMAT_U8;
+    handle->rate        = rate;
+    handle->latency     = latency; /* in ms */
 
 #ifdef HAS_ARTS    
     if( try_arts )
@@ -96,58 +84,56 @@ audio_dev_handle audio_init(int* rate, int* latency, int try_arts)
             fprintf(stderr, "Error initializing aRts: %s\n", arts_error_text(artserr));
             exit(-1);
         }
-        handle.arts_handle = arts_play_stream( *rate, 8, handle.channels+1, "arts-whitenoise" );
-        arts_stream_set(handle.arts_handle, ARTS_P_BUFFER_TIME, *latency);
-        handle.use_arts = 1;
+        handle->arts_handle = arts_play_stream( *rate, 8, handle->channels, "arts-whitenoise" );
+        arts_stream_set(handle->arts_handle, ARTS_P_BUFFER_TIME, *latency);
+        handle->use_arts = 1;
     }
     else
 #endif
     {
-        open_dev_dsp(&handle);
+        alsa_init(handle);
     }
-
-    return handle;
 }
 
 
 
 /* close sound device or disconnect from aRts server */
-void audio_exit( audio_dev_handle handle )
+void audio_exit(audio_dev_handle* handle)
 {
 #ifdef HAS_ARTS
-    if( handle.use_arts )
+    if(handle->use_arts)
     {
-        arts_close_stream( handle.arts_handle );
+        arts_close_stream(handle->arts_handle);
         arts_free();
     }
     else
 #endif
     {
-        close(handle.dev_dsp_handle);
+        snd_pcm_close(handle->alsa_handle);
     }
 }
 
 
 
 /* send audio to soundcard */
-void audio_write(audio_dev_handle handle, unsigned char* buffer, int size)
+void audio_write(audio_dev_handle* handle, unsigned char* buffer, int size)
 {
 #ifdef HAS_ARTS
-    if( handle.use_arts )
+    if(handle->use_arts)
     {
-        arts_write(handle.arts_handle, buffer, size);
+        arts_write(handle->arts_handle, buffer, size);
     }
     else
 #endif
     {
-        write(handle.dev_dsp_handle, buffer, size);
+        snd_pcm_writei(handle->alsa_handle, buffer, size);
     }
 }
 
 
 
 /* close the sound device and reopen with the requested rate */
-void audio_set_rate( audio_dev_handle* handle, int rate )
+void audio_set_rate(audio_dev_handle* handle, int rate)
 {
     handle->rate = rate;
 #ifdef HAS_ARTS
@@ -159,8 +145,8 @@ void audio_set_rate( audio_dev_handle* handle, int rate )
     else
 #endif
     {
-        close(handle->dev_dsp_handle);
-        open_dev_dsp(handle);
+        snd_pcm_close(handle->alsa_handle);
+        alsa_init(handle);
     }
 }
 
@@ -169,9 +155,9 @@ void audio_set_rate( audio_dev_handle* handle, int rate )
 /* configure the audio buffer sizes.  The latency parameter is in millisec. */
 void audio_set_latency(audio_dev_handle* handle, int latency)
 {
-    double samples;
+    handle->latency = latency;
 #ifdef HAS_ARTS
-    if( handle->use_arts )
+    if(handle->use_arts)
     {
         arts_close_stream(handle->arts_handle);
         handle->arts_handle = arts_play_stream(handle->rate, 8, handle->channels+1, "arts-whitenoise");
@@ -180,17 +166,9 @@ void audio_set_latency(audio_dev_handle* handle, int latency)
     else
 #endif
     {
-        samples = ((double) latency) / 1000.0 * ((double) handle->rate);
-        samples /= 2.0;
-
-        handle->fragment = ((int) (log(samples) / log(2.0))) + 2*65536;
-        close(handle->dev_dsp_handle);
-        open_dev_dsp(handle);
+        snd_pcm_close(handle->alsa_handle);
+        alsa_init(handle);
     }
 }
-
-
-
-
 
 /* arch-tag: DO_NOT_CHANGE_83580ce5-5d4c-4c21-9852-d05141de6afa */
